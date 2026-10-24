@@ -1,0 +1,13 @@
+# Fichiers de compilation C++ / Qt
+*.o
+*.obj
+*.exe
+*.user
+*.pro.user
+CMakeLists.txt.user
+.qmake.stash
+
+# Fichiers système et IDE
+.DS_Store
+.idea/
+.vscode/
