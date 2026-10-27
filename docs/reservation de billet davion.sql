@@ -1,0 +1,39 @@
+USE reservation_vol_db;
+
+CREATE TABLE IF NOT EXISTS UTILISATEUR (
+  id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(50) NOT NULL,
+  prenom VARCHAR(50) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  mot_de_passe VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'Client'
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS PASSAGER (
+  id_passager INT AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(50) NOT NULL,
+  prenom VARCHAR(50) NOT NULL,
+  date_naissance DATE NOT NULL,
+  numero_document VARCHAR(50)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS RESERVATION (
+  id_reservation INT AUTO_INCREMENT PRIMARY KEY,
+  reference VARCHAR(20) NOT NULL UNIQUE,
+  date_reservation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  nombre_billets INT NOT NULL CHECK (nombre_billets > 0),
+  prix_total DECIMAL(10,2) NOT NULL,
+  statut VARCHAR(20) NOT NULL DEFAULT 'Confirmée',
+  id_utilisateur INT NOT NULL,
+  id_vol INT NOT NULL,
+  FOREIGN KEY (id_utilisateur) REFERENCES UTILISATEUR(id_utilisateur) ON DELETE CASCADE,
+  FOREIGN KEY (id_vol) REFERENCES VOL(id_vol) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS CONTIENT_PASSAGER (
+  id_reservation INT NOT NULL,
+  id_passager INT NOT NULL,
+  PRIMARY KEY (id_reservation, id_passager),
+  FOREIGN KEY (id_reservation) REFERENCES RESERVATION(id_reservation) ON DELETE CASCADE,
+  FOREIGN KEY (id_passager) REFERENCES PASSAGER(id_passager) ON DELETE CASCADE
+) ENGINE=InnoDB;
