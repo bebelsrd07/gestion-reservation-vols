@@ -1,0 +1,18 @@
+[mysql]
+hote=127.0.0.1
+port=3306
+base=reservation_vol_db
+utilisateur=root
+mot_de_passe=
+
+[smtp]
+serveur=smtp.gmail.com
+port=465
+identifiant=
+email_expediteur=votre.adresse@gmail.com
+mot_de_passe_application=xxxx xxxx xxxx xxxx
+nom_expediteur=TicketFly
+
+[paiement]
+mobile_money=MVola : 034 00 123 45  |  Orange Money : 032 00 123 45  |  Airtel : 033 00 123 45 (Compte : TicketFly)
+carte_bancaire=Portail TicketFly — Visa / Mastercard / BNI Madagascar (Marchand : TICKETFLY-MG)

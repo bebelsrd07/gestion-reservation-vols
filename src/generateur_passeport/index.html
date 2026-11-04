@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Générateur de Faux Passeport (Spécimen Projet L1)</title>
+  <style>
+    * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f2f4f7;
+      color: #1f2937;
+    }
+    .conteneur {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .carte {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+      color: #111827;
+    }
+    .sous-titre {
+      margin: 0 0 18px 0;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="date"], select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #9ca3af;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .ligne-numero {
+      display: flex;
+      gap: 8px;
+    }
+    .ligne-numero input {
+      flex: 1;
+      font-family: Consolas, monospace;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    button {
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #2563eb;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    button.secondaire {
+      background: #f9fafb;
+      color: #1f2937;
+      border-color: #9ca3af;
+    }
+    button:hover { opacity: 0.92; }
+    .actions-export {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .actions-export button {
+      flex: 1;
+      padding: 10px 14px;
+    }
+    canvas {
+      width: 100%;
+      max-width: 740px;
+      height: auto;
+      border: 1px solid #9ca3af;
+      border-radius: 8px;
+      display: block;
+      background: #fff;
+    }
+    .note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: #1e3a8a;
+      line-height: 1.45;
+    }
+    @media (max-width: 900px) {
+      .conteneur { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="conteneur">
+    <div class="carte">
+      <h1>Générateur de Passeport</h1>
+      <p class="sous-titre">Outil autonome pour tester la vérification de passeport dans l'application Qt.</p>
+
+      <label for="champNom">Nom de famille</label>
+      <input type="text" id="champNom" value="RAKOTO" placeholder="Ex : RAKOTO">
+
+      <label for="champPrenom">Prénom(s)</label>
+      <input type="text" id="champPrenom" value="Jean" placeholder="Ex : Jean">
+
+      <label for="champNaissance">Date de naissance</label>
+      <input type="date" id="champNaissance" value="2002-05-15">
+
+      <label for="champPays">Nationalité / Pays émetteur</label>
+      <select id="champPays">
+        <option value="MG|MDG|MALAGASY">Madagascar (MG)</option>
+        <option value="FR|FRA|FRANCAISE">France (FR)</option>
+        <option value="MU|MUS|MAURICIENNE">Maurice (MU)</option>
+        <option value="RE|FRA|FRANCAISE">La Réunion (RE)</option>
+        <option value="CA|CAN|CANADIENNE">Canada (CA)</option>
+        <option value="GB|GBR|BRITANNIQUE">Royaume-Uni (GB)</option>
+      </select>
+
+      <label for="champSexe">Sexe</label>
+      <select id="champSexe">
+        <option value="M">M (Masculin)</option>
+        <option value="F">F (Féminin)</option>
+      </select>
+
+      <label for="champNumero">Numéro de passeport (structuré aléatoire)</label>
+      <div class="ligne-numero">
+        <input type="text" id="champNumero" maxlength="12">
+        <button type="button" class="secondaire" id="btnRegenerer" title="Générer un nouveau numéro">Aléatoire</button>
+        <button type="button" class="secondaire" id="btnCopier" title="Copier le numéro">Copier</button>
+      </div>
+
+      <label for="champPhoto">Photo d'identité (optionnelle)</label>
+      <input type="file" id="champPhoto" accept="image/*">
+
+      <div class="actions-export">
+        <button type="button" id="btnExportPdf">Exporter en PDF (.pdf)</button>
+        <button type="button" class="secondaire" id="btnExportPng">Exporter en Image (.png)</button>
+      </div>
+
+      <div class="note">
+        <strong>Fonctionnement sans OCR :</strong> le fichier généré (PDF ou PNG) contient une balise de métadonnées structurée
+        (<code>PASSEPORT_DATA|NUMERO=...|NOM=...|PRENOM=...</code>) que l'application C++/Qt lit directement pour vérifier la correspondance exacte avec le formulaire de réservation.
+      </div>
+    </div>
+
+    <div class="carte">
+      <h1>Aperçu du spécimen</h1>
+      <p class="sous-titre">Document fictif réservé aux démonstrations pédagogiques (L1 Informatique).</p>
+      <canvas id="canvasPasseport" width="820" height="530"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Je garde ici toute la logique de dessin et d'export sans bibliothèque externe
+    // pour que la page fonctionne hors-ligne le jour de la soutenance.
+    const champNom = document.getElementById('champNom');
+    const champPrenom = document.getElementById('champPrenom');
+    const champNaissance = document.getElementById('champNaissance');
+    const champPays = document.getElementById('champPays');
+    const champSexe = document.getElementById('champSexe');
+    const champNumero = document.getElementById('champNumero');
+    const champPhoto = document.getElementById('champPhoto');
+    const canvas = document.getElementById('canvasPasseport');
+    const ctx = canvas.getContext('2d');
+
+    let imageChargee = null;
+
+    function nettoyerMrz(texte) {
+      return (texte || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '<');
+    }
+
+    function genererNumeroPasseport() {
+      const code2 = champPays.value.split('|')[0] || 'MG';
+      let chiffres = '';
+      for (let i = 0; i < 7; i++) {
+        chiffres += Math.floor(Math.random() * 10).toString();
+      }
+      champNumero.value = code2 + chiffres;
+      dessinerPasseport();
+    }
+
+    function construireBaliseMetadonnees() {
+      const nom = (champNom.value || '').trim().toUpperCase();
+      const prenom = (champPrenom.value || '').trim();
+      const numero = (champNumero.value || '').trim().toUpperCase();
+      const naissance = (champNaissance.value || '2000-01-01').trim();
+      return `PASSEPORT_DATA|NUMERO=${numero}|NOM=${nom}|PRENOM=${prenom}|NAISSANCE=${naissance}|`;
+    }
+
+    function dessinerPortraitParDefaut(x, y, w, h) {
+      ctx.fillStyle = '#e5e7eb';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#9ca3af';
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + h * 0.38, w * 0.24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + h * 1.02, w * 0.44, Math.PI, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function dessinerPasseport() {
+      const nom = (champNom.value || 'NOM').trim().toUpperCase();
+      const prenom = (champPrenom.value || 'Prenom').trim();
+      const naissance = champNaissance.value || '2002-05-15';
+      const [code2, code3, nat] = champPays.value.split('|');
+      const sexe = champSexe.value;
+      const numero = (champNumero.value || 'MG0000000').trim().toUpperCase();
+
+      // Fond façon papier sécurisé
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#fdfcfb');
+      grad.addColorStop(1, '#eef2f6');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Motifs discrets de fond
+      ctx.strokeStyle = 'rgba(37, 99, 235, 0.07)';
+      ctx.lineWidth = 1;
+      for (let r = 40; r < 420; r += 26) {
+        ctx.beginPath();
+        ctx.arc(640, 230, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Bandeau supérieur officiel
+      ctx.fillStyle = '#1e3a8a';
+      ctx.fillRect(0, 0, canvas.width, 72);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px "Segoe UI", Arial';
+      ctx.fillText('PASSEPORT  /  PASSPORT  —  SPÉCIMEN ÉTUDIANT', 28, 34);
+      ctx.font = '13px "Segoe UI", Arial';
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillText(`ÉTAT ÉMETTEUR : ${code3}   |   DOCUMENT DE DÉMONSTRATION SANS VALEUR LÉGALE`, 28, 56);
+
+      // Cadre photo
+      const px = 34, py = 102, pw = 190, ph = 245;
+      if (imageChargee) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(px, py, pw, ph);
+        ctx.clip();
+        const ratio = Math.max(pw / imageChargee.width, ph / imageChargee.height);
+        const dw = imageChargee.width * ratio;
+        const dh = imageChargee.height * ratio;
+        ctx.drawImage(imageChargee, px + (pw - dw) / 2, py + (ph - dh) / 2, dw, dh);
+        ctx.restore();
+      } else {
+        dessinerPortraitParDefaut(px, py, pw, ph);
+      }
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px, py, pw, ph);
+
+      // Libellés et valeurs
+      function champ(x, y, titre, valeur, mono = false) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = 'bold 11px "Segoe UI", Arial';
+        ctx.fillText(titre.toUpperCase(), x, y);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = mono ? 'bold 19px Consolas, monospace' : 'bold 18px "Segoe UI", Arial';
+        ctx.fillText(valeur, x, y + 23);
+      }
+
+      champ(255, 115, 'Type', 'P');
+      champ(355, 115, 'Code pays', code3);
+      champ(515, 115, 'N° de passeport / Passport No.', numero, true);
+
+      champ(255, 178, 'Nom / Surname', nom);
+      champ(255, 240, 'Prénom(s) / Given names', prenom);
+
+      champ(255, 302, 'Nationalité / Nationality', nat);
+      champ(545, 302, 'Sexe / Sex', sexe);
+
+      const partiesDate = naissance.split('-');
+      const dateAffichee = partiesDate.length === 3
+        ? `${partiesDate[2]}/${partiesDate[1]}/${partiesDate[0]}`
+        : naissance;
+      champ(255, 362, 'Date de naissance / Date of birth', dateAffichee);
+      champ(545, 362, 'Date d\'expiration / Expiry', '02/11/2036');
+
+      // Tampon spécimen
+      ctx.save();
+      ctx.translate(685, 245);
+      ctx.rotate(-0.22);
+      ctx.strokeStyle = 'rgba(185, 28, 28, 0.38)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(-85, -24, 170, 44);
+      ctx.fillStyle = 'rgba(185, 28, 28, 0.38)';
+      ctx.font = 'bold 20px Arial';
+      ctx.fillText('SPÉCIMEN L1', -68, 5);
+      ctx.restore();
+
+      // Zone MRZ en bas
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 422, canvas.width, 108);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, 422);
+      ctx.lineTo(canvas.width, 422);
+      ctx.stroke();
+
+      const mrz1Base = `P<${code3}${nettoyerMrz(nom)}<<${nettoyerMrz(prenom)}`;
+      const mrz1 = (mrz1Base + '<'.repeat(44)).slice(0, 44);
+      const dateMrz = partiesDate.length === 3
+        ? `${partiesDate[0].slice(2)}${partiesDate[1]}${partiesDate[2]}`
+        : '000101';
+      const mrz2Base = `${nettoyerMrz(numero).padEnd(9, '<')}7${code3}${dateMrz}4${sexe}3611028`;
+      const mrz2 = (mrz2Base + '<'.repeat(44)).slice(0, 44);
+
+      ctx.fillStyle = '#111827';
+      ctx.font = 'bold 21px Consolas, "Courier New", monospace';
+      ctx.fillText(mrz1, 28, 464);
+      ctx.fillText(mrz2, 28, 502);
+    }
+
+    // Table CRC32 standard pour insérer un bloc tEXt valide dans un fichier PNG
+    const tableCrc = (() => {
+      const t = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) {
+          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        t[n] = c >>> 0;
+      }
+      return t;
+    })();
+
+    function calculerCrc32(octets) {
+      let crc = 0xFFFFFFFF;
+      for (let i = 0; i < octets.length; i++) {
+        crc = tableCrc[(crc ^ octets[i]) & 0xFF] ^ (crc >>> 8);
+      }
+      return (crc ^ 0xFFFFFFFF) >>> 0;
+    }
+
+    function base64VersUint8Array(b64) {
+      const bin = atob(b64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return arr;
+    }
+
+    function telechargerOctets(octets, typeMime, nomFichier) {
+      const blob = new Blob([octets], { type: typeMime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nomFichier;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // Export PNG avec métadonnée tEXt non compressée lisible sans OCR par Qt
+    function exporterPng() {
+      dessinerPasseport();
+      const dataUrl = canvas.toDataURL('image/png');
+      const pngOriginal = base64VersUint8Array(dataUrl.split(',')[1]);
+
+      const enc = new TextEncoder();
+      const cle = enc.encode('Comment\0');
+      const valeur = enc.encode(construireBaliseMetadonnees());
+      const donneesChunk = new Uint8Array(cle.length + valeur.length);
+      donneesChunk.set(cle, 0);
+      donneesChunk.set(valeur, cle.length);
+
+      const typeChunk = enc.encode('tEXt');
+      const pourCrc = new Uint8Array(typeChunk.length + donneesChunk.length);
+      pourCrc.set(typeChunk, 0);
+      pourCrc.set(donneesChunk, typeChunk.length);
+      const crc = calculerCrc32(pourCrc);
+
+      const chunkComplet = new Uint8Array(12 + donneesChunk.length);
+      const vue = new DataView(chunkComplet.buffer);
+      vue.setUint32(0, donneesChunk.length, false);
+      chunkComplet.set(typeChunk, 4);
+      chunkComplet.set(donneesChunk, 8);
+      vue.setUint32(8 + donneesChunk.length, crc, false);
+
+      // On insère le chunk tEXt juste avant les 12 derniers octets (IEND)
+      const posIend = pngOriginal.length - 12;
+      const sortie = new Uint8Array(pngOriginal.length + chunkComplet.length);
+      sortie.set(pngOriginal.subarray(0, posIend), 0);
+      sortie.set(chunkComplet, posIend);
+      sortie.set(pngOriginal.subarray(posIend), posIend + chunkComplet.length);
+
+      const num = (champNumero.value || 'PASSEPORT').trim().toUpperCase();
+      telechargerOctets(sortie, 'image/png', `passeport_${num}.png`);
+    }
+
+    // Export PDF 1.4 autonome intégrant l'image JPEG du passeport + la balise texte brute
+    function exporterPdf() {
+      dessinerPasseport();
+      const jpegUrl = canvas.toDataURL('image/jpeg', 0.92);
+      const jpegOctets = base64VersUint8Array(jpegUrl.split(',')[1]);
+      const enc = new TextEncoder();
+      const balise = construireBaliseMetadonnees();
+      const balisePdf = balise.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+
+      const morceaux = [];
+      let tailleTotale = 0;
+      const offsets = [0];
+
+      function ajouterTexte(txt) {
+        const b = enc.encode(txt);
+        morceaux.push(b);
+        tailleTotale += b.length;
+      }
+      function ajouterBinaire(b) {
+        morceaux.push(b);
+        tailleTotale += b.length;
+      }
+
+      ajouterTexte('%PDF-1.4\n');
+
+      // Objet 1 : Catalogue
+      offsets.push(tailleTotale);
+      ajouterTexte('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+
+      // Objet 2 : Pages
+      offsets.push(tailleTotale);
+      ajouterTexte('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+
+      // Objet 3 : Page A4 paysage-carte
+      offsets.push(tailleTotale);
+      ajouterTexte('3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 420] ' +
+                   '/Resources << /XObject << /Im0 4 0 R >> /Font << /F1 6 0 R >> >> ' +
+                   '/Contents 5 0 R >>\nendobj\n');
+
+      // Objet 4 : Image JPEG du passeport
+      offsets.push(tailleTotale);
+      ajouterTexte(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} ` +
+                   `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegOctets.length} >>\nstream\n`);
+      ajouterBinaire(jpegOctets);
+      ajouterTexte('\nendstream\nendobj\n');
+
+      // Objet 5 : Contenu graphique + métadonnée lisible
+      const fluxContenu = `q\n535 0 0 346 30 44 cm\n/Im0 Do\nQ\nBT /F1 7 Tf 30 22 Td (${balisePdf}) Tj ET\n`;
+      const octetsContenu = enc.encode(fluxContenu);
+      offsets.push(tailleTotale);
+      ajouterTexte(`5 0 obj\n<< /Length ${octetsContenu.length} >>\nstream\n`);
+      ajouterBinaire(octetsContenu);
+      ajouterTexte('\nendstream\nendobj\n');
+
+      // Objet 6 : Police standard Helvetica
+      offsets.push(tailleTotale);
+      ajouterTexte('6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n');
+
+      // Objet 7 : Dictionnaire Info avec la balise exacte
+      offsets.push(tailleTotale);
+      ajouterTexte(`7 0 obj\n<< /Title (Passeport Specimen) /Subject (${balisePdf}) >>\nendobj\n`);
+
+      const posXref = tailleTotale;
+      let xref = `xref\n0 ${offsets.length}\n0000000000 65535 f \n`;
+      for (let i = 1; i < offsets.length; i++) {
+        xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+      }
+      xref += `trailer\n<< /Size ${offsets.length} /Root 1 0 R /Info 7 0 R >>\nstartxref\n${posXref}\n%%EOF\n`;
+      ajouterTexte(xref);
+
+      const finalPdf = new Uint8Array(tailleTotale);
+      let curseur = 0;
+      for (const m of morceaux) {
+        finalPdf.set(m, curseur);
+        curseur += m.length;
+      }
+
+      const num = (champNumero.value || 'PASSEPORT').trim().toUpperCase();
+      telechargerOctets(finalPdf, 'application/pdf', `passeport_${num}.pdf`);
+    }
+
+    champPhoto.addEventListener('change', (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) {
+        imageChargee = null;
+        dessinerPasseport();
+        return;
+      }
+      const lecteur = new FileReader();
+      lecteur.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          imageChargee = img;
+          dessinerPasseport();
+        };
+        img.src = lecteur.result;
+      };
+      lecteur.readAsDataURL(f);
+    });
+
+    [champNom, champPrenom, champNaissance, champPays, champSexe, champNumero].forEach((el) => {
+      el.addEventListener('input', dessinerPasseport);
+      el.addEventListener('change', dessinerPasseport);
+    });
+
+    champPays.addEventListener('change', genererNumeroPasseport);
+    document.getElementById('btnRegenerer').addEventListener('click', genererNumeroPasseport);
+    document.getElementById('btnCopier').addEventListener('click', () => {
+      navigator.clipboard && navigator.clipboard.writeText(champNumero.value);
+    });
+    document.getElementById('btnExportPng').addEventListener('click', exporterPng);
+    document.getElementById('btnExportPdf').addEventListener('click', exporterPdf);
+
+    genererNumeroPasseport();
+  </script>
+</body>
+</html>
