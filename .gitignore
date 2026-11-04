@@ -1,13 +1,46 @@
-# Fichiers de compilation C++ / Qt
-*.o
-*.obj
-*.exe
+# Compilation Qt / CMake
+build/
+build-*/
+cmake-build-*/
+.qtcreator/
+.qtc_clangd/
+.cache/
+CMakeFiles/
+CMakeCache.txt
+CMakeUserPresets.json
 *.user
-*.pro.user
-CMakeLists.txt.user
-.qmake.stash
+*.user.*
 
-# Fichiers système et IDE
-.DS_Store
-.idea/
-.vscode/
+# Binaires générés
+*.exe
+*.dll
+*.obj
+*.o
+*.pdb
+*.ilk
+*.a
+*.lib
+deploy/
+release/
+
+# Configuration personnelle et secrets
+config.ini
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Données privées et documents générés
+billets_generes/
+backups/
+private/
+passeports_prives/
+
+# Environnements Python éventuels
+.venv/
+.venv-docs/
+
+# Windows
+Thumbs.db
+Desktop.ini

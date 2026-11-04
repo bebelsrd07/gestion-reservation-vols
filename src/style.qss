@@ -1,0 +1,427 @@
+/* ==========================================================
+   STYLE NÉO-BRUTALISTE (façon Gumroad) - Palette Happy Hues n°10
+   Fond        #abd1c6   (vert d'eau)
+   Trait       #001e1d   (presque noir)  -> toutes les bordures
+   Carte       #004643   (vert profond)
+   Accent      #f9bc60   (jaune action principale)
+   Confirmer   #15803d   (vert franc validation / confirmation)
+   Avertir     #eb8c34   (ambre avertissement / attente)
+   Danger      #e16162   (rouge annulation / suppression)
+   Secondaire  #fffffe / #e8e4e6
+   ========================================================== */
+
+/* === BASE === */
+QMainWindow {
+    color: #001e1d;
+    font-family: "Segoe UI", Arial;
+    font-size: 13px;
+}
+QDialog {
+    background-color: #abd1c6;
+    color: #001e1d;
+    font-family: "Segoe UI", Arial;
+    font-size: 13px;
+}
+QWidget {
+    color: #001e1d;
+}
+QWidget#centralwidget, QStackedWidget {
+    background: transparent;
+}
+QLabel {
+    color: #001e1d;
+    font-weight: 600;
+}
+QLabel#carteInfo {
+    background-color: #fffffe;
+    border: 2px solid #001e1d;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+QFrame#carteAccueilGumroad {
+    background-color: #fffffe;
+    border: 2px solid #001e1d;
+    border-width: 2px 5px 5px 2px;
+    border-radius: 14px;
+}
+QLabel#badgeTicketFly {
+    background-color: #f9bc60;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-weight: 800;
+}
+QToolTip {
+    background-color: #f9bc60;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    padding: 4px 6px;
+}
+QStatusBar {
+    background-color: #e8e4e6;
+    color: #001e1d;
+    border-top: 2px solid #001e1d;
+}
+QMessageBox {
+    background-color: #abd1c6;
+}
+QScrollArea {
+    background-color: transparent;
+    border: none;
+}
+QGroupBox {
+    background-color: #e8e4e6;
+    border: 2px solid #001e1d;
+    border-radius: 8px;
+    margin-top: 14px;
+    padding: 12px 8px 8px 8px;
+    font-weight: 700;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    padding: 2px 8px;
+    background-color: #f9bc60;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-radius: 6px;
+}
+
+/* === NAVIGATION === */
+QToolBar {
+    background-color: #004643;
+    spacing: 8px;
+    padding: 7px 10px;
+    border: none;
+    border-bottom: 3px solid #001e1d;
+}
+QToolBar QToolButton {
+    color: #fffffe;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-weight: 700;
+}
+QToolBar QToolButton:hover {
+    background-color: #abd1c6;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+}
+QToolBar QToolButton:checked {
+    background-color: #f9bc60;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-width: 2px 4px 4px 2px;
+}
+QToolBar QLabel {
+    color: #abd1c6;
+}
+QToolBar QComboBox {
+    background-color: #fffffe;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-width: 2px 3px 3px 2px;
+    border-radius: 7px;
+    padding: 3px 8px;
+    min-width: 108px;
+    font-weight: 700;
+}
+
+/* === BOUTONS STANDARDISÉS === */
+/* Par défaut : Action principale (Jaune Gumroad) */
+QPushButton {
+    background-color: #f9bc60;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-width: 2px 4px 4px 2px;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 700;
+}
+QPushButton:hover {
+    background-color: #fcd08c;
+}
+QPushButton:pressed {
+    background-color: #f9bc60;
+    border-width: 4px 2px 2px 4px;
+}
+QPushButton:disabled {
+    background-color: #e8e4e6;
+    color: #6b7f7e;
+    border: 2px solid #6b7f7e;
+}
+
+/* Standard "Confirmer / Valider" (Vert franc) */
+QPushButton[roleBtn="confirmer"], QPushButton#btnReserverSelection {
+    background-color: #15803d;
+    color: #fffffe;
+}
+QPushButton[roleBtn="confirmer"]:hover, QPushButton#btnReserverSelection:hover {
+    background-color: #1ea350;
+}
+QPushButton[roleBtn="confirmer"]:pressed, QPushButton#btnReserverSelection:pressed {
+    background-color: #15803d;
+}
+
+/* Standard "Annuler / Supprimer / Danger" (Rouge corail) */
+QPushButton[roleBtn="danger"] {
+    background-color: #e16162;
+    color: #fffffe;
+}
+QPushButton[roleBtn="danger"]:hover {
+    background-color: #ec7b7c;
+}
+QPushButton[roleBtn="danger"]:pressed {
+    background-color: #c94c4d;
+}
+
+/* Standard "Avertissement / Attente" (Orange ambré) */
+QPushButton[roleBtn="avertissement"] {
+    background-color: #eb8c34;
+    color: #001e1d;
+}
+QPushButton[roleBtn="avertissement"]:hover {
+    background-color: #f4a459;
+}
+QPushButton[roleBtn="avertissement"]:pressed {
+    background-color: #d97a24;
+}
+
+/* Standard "Neutre / Secondaire" (Clair) */
+QPushButton[roleBtn="secondaire"], QPushButton#btnReinitialiserFiltres {
+    background-color: #e8e4e6;
+    color: #001e1d;
+}
+QPushButton[roleBtn="secondaire"]:hover, QPushButton#btnReinitialiserFiltres:hover {
+    background-color: #fffffe;
+}
+
+/* Bouton icône seule (Actualiser sans texte) */
+QPushButton[roleBtn="icone"] {
+    background-color: #fffffe;
+    color: #001e1d;
+    padding: 5px 8px;
+    min-width: 32px;
+    max-width: 38px;
+}
+QPushButton[roleBtn="icone"]:hover {
+    background-color: #f9bc60;
+}
+
+/* === CHAMPS, LISTES DÉROULANTES ET AUTOCOMPLÉTION (CORRECTION MODE SOMBRE) === */
+QLineEdit, QComboBox, QDateEdit, QDateTimeEdit, QSpinBox, QDoubleSpinBox,
+QPlainTextEdit {
+    background-color: #fffffe;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-radius: 8px;
+    padding: 5px 9px;
+    selection-background-color: #f9bc60;
+    selection-color: #001e1d;
+}
+QLineEdit:hover, QComboBox:hover, QDateEdit:hover, QDateTimeEdit:hover,
+QSpinBox:hover, QDoubleSpinBox:hover, QPlainTextEdit:hover {
+    background-color: #f6f4f5;
+}
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus, QDateTimeEdit:focus,
+QSpinBox:focus, QDoubleSpinBox:focus, QPlainTextEdit:focus {
+    background-color: #fffffe;
+    border: 2px solid #001e1d;
+    border-width: 2px 4px 4px 2px;
+}
+QLineEdit:disabled, QComboBox:disabled, QDateEdit:disabled,
+QDateTimeEdit:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled {
+    background-color: #e8e4e6;
+    color: #6b7f7e;
+    border-color: #6b7f7e;
+}
+QDateEdit {
+    min-width: 112px;
+}
+
+/* Listes déroulantes des pays/villes (QCompleter QListView + QComboBox + Menus) */
+QListView, QComboBox QAbstractItemView, QMenu {
+    background-color: #fffffe;
+    color: #001e1d;
+    border: 2px solid #001e1d;
+    border-radius: 6px;
+    selection-background-color: #f9bc60;
+    selection-color: #001e1d;
+    outline: none;
+    padding: 2px;
+}
+QListView::item, QComboBox QAbstractItemView::item, QMenu::item {
+    background-color: #fffffe;
+    color: #001e1d;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+QListView::item:hover, QComboBox QAbstractItemView::item:hover, QMenu::item:selected {
+    background-color: #abd1c6;
+    color: #001e1d;
+}
+QListView::item:selected, QComboBox QAbstractItemView::item:selected {
+    background-color: #f9bc60;
+    color: #001e1d;
+    font-weight: 700;
+}
+
+/* Calendrier déroulant (évite aussi tout conflit sombre Windows) */
+QCalendarWidget QWidget {
+    background-color: #fffffe;
+    color: #001e1d;
+    alternate-background-color: #e8e4e6;
+}
+QCalendarWidget QToolButton {
+    background-color: #004643;
+    color: #fffffe;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: 700;
+}
+QCalendarWidget QAbstractItemView:enabled {
+    background-color: #fffffe;
+    color: #001e1d;
+    selection-background-color: #f9bc60;
+    selection-color: #001e1d;
+}
+QCalendarWidget QAbstractItemView:disabled {
+    color: #94a3b8;
+}
+
+/* === FILTRES === */
+QCheckBox {
+    color: #001e1d;
+    spacing: 7px;
+    font-weight: 600;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #001e1d;
+    border-radius: 4px;
+    background-color: #fffffe;
+}
+QCheckBox::indicator:hover {
+    background-color: #e8e4e6;
+}
+QCheckBox::indicator:checked {
+    background-color: #f9bc60;
+}
+QCheckBox:disabled {
+    color: #6b7f7e;
+}
+
+/* === TABLEAUX ET LISTES === */
+QTableView, QListWidget {
+    background-color: #fffffe;
+    color: #001e1d;
+    alternate-background-color: #f1efee;
+    border: 2px solid #001e1d;
+    border-radius: 8px;
+    gridline-color: #abd1c6;
+    selection-background-color: #f9bc60;
+    selection-color: #001e1d;
+    outline: none;
+}
+QTableView::item, QListWidget::item {
+    color: #001e1d;
+    padding: 6px 8px;
+    border-bottom: 1px solid #d5e6e0;
+}
+QTableView::item:selected, QListWidget::item:selected {
+    background-color: #f9bc60;
+    color: #001e1d;
+    font-weight: 700;
+}
+QTableView::item:hover, QListWidget::item:hover {
+    background-color: #abd1c6;
+    color: #001e1d;
+}
+QHeaderView::section {
+    background-color: #004643;
+    color: #fffffe;
+    padding: 8px 7px;
+    border: none;
+    border-right: 2px solid #001e1d;
+    border-bottom: 2px solid #001e1d;
+    font-weight: 700;
+}
+QTableCornerButton::section {
+    background-color: #004643;
+    border: none;
+    border-bottom: 2px solid #001e1d;
+}
+
+/* === BARRES DE DÉFILEMENT === */
+QScrollBar:vertical {
+    background-color: #e8e4e6;
+    width: 14px;
+    margin: 2px;
+    border: 2px solid #001e1d;
+    border-radius: 7px;
+}
+QScrollBar::handle:vertical {
+    background-color: #004643;
+    min-height: 28px;
+    border-radius: 5px;
+}
+QScrollBar::handle:vertical:hover {
+    background-color: #f9bc60;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: transparent;
+}
+QScrollBar:horizontal {
+    background-color: #e8e4e6;
+    height: 14px;
+    margin: 2px;
+    border: 2px solid #001e1d;
+    border-radius: 7px;
+}
+QScrollBar::handle:horizontal {
+    background-color: #004643;
+    min-width: 28px;
+    border-radius: 5px;
+}
+QScrollBar::handle:horizontal:hover {
+    background-color: #f9bc60;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
+
+/* === ONGLETS === */
+QTabWidget::pane {
+    border: 2px solid #001e1d;
+    border-radius: 8px;
+    background: #fffffe;
+    top: -2px;
+}
+QTabBar::tab {
+    background: #e8e4e6;
+    color: #001e1d;
+    padding: 8px 15px;
+    border: 2px solid #001e1d;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: 4px;
+    font-weight: 600;
+}
+QTabBar::tab:hover {
+    background-color: #abd1c6;
+}
+QTabBar::tab:selected {
+    background-color: #f9bc60;
+    font-weight: 700;
+}
