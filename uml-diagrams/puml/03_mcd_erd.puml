@@ -1,0 +1,117 @@
+@startuml
+' MCD - Modèle Conceptuel de Données (Entité-Relation)
+' Projet TicketFly : Base de données reservation_vol_db (MySQL)
+
+skinparam linetype ortho
+
+entity "UTILISATEUR" as utilisateur {
+  * id_utilisateur : INT <<PK>>
+  --
+  * nom : VARCHAR(50)
+  * prenom : VARCHAR(50)
+  * email : VARCHAR(100) <<UK>>
+  * mot_de_passe : VARCHAR(255)
+  * role : ENUM('client','admin','super_admin')
+  * est_bloque : TINYINT(1)
+  * date_creation : DATETIME
+}
+
+entity "AEROPORT" as aeroport {
+  * id_aeroport : INT <<PK>>
+  --
+  * code_iata : CHAR(3) <<UK>>
+  * nom_aeroport : VARCHAR(100)
+  * ville : VARCHAR(80)
+  * pays : VARCHAR(80)
+  * code_pays : CHAR(2)
+  * latitude : DECIMAL(9,6)
+  * longitude : DECIMAL(9,6)
+  * est_hub : TINYINT(1)
+}
+
+entity "LIAISON" as liaison {
+  * id_liaison : INT <<PK>>
+  --
+  * id_aeroport_depart : INT <<FK>>
+  * id_aeroport_arrivee : INT <<FK>>
+  * distance_km : INT
+  * duree_minutes : INT
+  * prix_base : DECIMAL(8,2)
+}
+
+entity "VOL" as vol {
+  * id_vol : INT <<PK>>
+  --
+  * numero_vol : VARCHAR(16) <<UK>>
+  * compagnie : VARCHAR(60)
+  * id_aeroport_depart : INT <<FK>>
+  * id_aeroport_arrivee : INT <<FK>>
+  * date_depart : DATETIME
+  * date_arrivee : DATETIME
+  * distance_km : INT
+  * duree_minutes : INT
+  * prix : DECIMAL(8,2)
+  * capacite : INT
+  * places_disponibles : INT
+  * statut_vol : ENUM('programme','annule')
+}
+
+entity "RESERVATION" as reservation {
+  * id_reservation : INT <<PK>>
+  --
+  * reference : VARCHAR(20) <<UK>>
+  * id_utilisateur : INT <<FK>>
+  * nb_places : INT
+  * prix_total : DECIMAL(10,2)
+  * statut : ENUM('en_attente','confirmee','annulee')
+  * nb_escales : INT
+  mode_paiement : VARCHAR(40)
+  contact_paiement : VARCHAR(100)
+  reference_paiement : VARCHAR(80)
+  * date_reservation : DATETIME
+}
+
+entity "RESERVATION_VOL" as reservation_vol {
+  * id_reservation : INT <<PK, FK>>
+  * ordre_troncon : INT <<PK>>
+  --
+  * id_vol : INT <<FK>>
+}
+
+entity "PASSAGER" as passager {
+  * id_passager : INT <<PK>>
+  --
+  * id_reservation : INT <<FK>>
+  * nom : VARCHAR(60)
+  * prenom : VARCHAR(60)
+  * date_naissance : DATE
+  * numero_passeport : VARCHAR(20)
+  * siege : VARCHAR(8)
+}
+
+entity "NOTIFICATION_MESSAGE" as notification {
+  * id_message : INT <<PK>>
+  --
+  id_destinataire : INT
+  role_cible : ENUM('client','admin')
+  id_expediteur : INT
+  nom_expediteur : VARCHAR(100)
+  email_expediteur : VARCHAR(100)
+  categorie : VARCHAR(40)
+  sujet : VARCHAR(160)
+  contenu : TEXT
+  est_lu : TINYINT(1)
+  date_envoi : DATETIME
+}
+
+utilisateur ||--o{ reservation : "effectue (1,N)"
+aeroport ||--o{ liaison : "depart (1,N)"
+aeroport ||--o{ liaison : "arrivee (1,N)"
+aeroport ||--o{ vol : "depart (1,N)"
+aeroport ||--o{ vol : "arrivee (1,N)"
+reservation ||--|{ reservation_vol : "composee de (1,N)"
+vol ||--o{ reservation_vol : "inclus dans (0,N)"
+reservation ||--|{ passager : "concerne (1,N)"
+utilisateur ||--o{ notification : "reçoit (0,N)"
+
+@enduml

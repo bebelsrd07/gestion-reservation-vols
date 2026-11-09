@@ -1,0 +1,39 @@
+%% Diagramme de Séquence UML - Réservation de billet & Paiement TicketFly
+sequenceDiagram
+  autonumber
+  actor C as Client
+  participant MW as MainWindow (Qt GUI)
+  participant PAW as PlanAvionWidget
+  participant DB as DatabaseManager (MySQL)
+  participant PDF as BilletPdf
+  participant SMTP as SmtpClient (SSL/TLS)
+
+  C->>MW: 1. Saisie recherche (Départ, Arrivée, Date, Passagers)
+  MW->>DB: chargerAeroports() & chargerLiaisons()
+  DB-->>MW: Liste aéroports + graphe des liaisons
+  MW->>MW: Calcul des itinéraires direct + escales (A*)
+  MW-->>C: Affichage des itinéraires trouvés
+
+  C->>MW: 2. Sélection d'un itinéraire + Clic "Réserver"
+  MW->>DB: chargerSiegesOccupesVol(idVol)
+  DB-->>MW: Liste des sièges déjà réservés
+  MW->>PAW: configurerCabine(nbPassagers, siegesOccupes)
+  PAW-->>C: Affichage de la carte des sièges interactive
+
+  C->>PAW: 3. Choix des sièges (ex: 12A, 12B)
+  PAW-->>MW: signal selectionModifiee() + calcul supplément
+  C->>MW: 4. Remplissage des passagers (Nom, Prénom, Passeport) + Infos Paiement TicketFly
+  C->>MW: 5. Clic "Valider la réservation"
+
+  MW->>DB: creerReservation(idUser, itineraire, passagers, paiement)
+  Note over DB: INSERT INTO reservation (statut='en_attente')<br/>INSERT INTO reservation_vol<br/>INSERT INTO passager<br/>UPDATE vol SET places_disponibles = places - N
+  DB-->>MW: Référence générée (ex: "RES-2026-X89A")
+
+  MW->>DB: obtenirDetailsReservation(reference)
+  DB-->>MW: DetailsReservation complets
+  MW->>PDF: genererBilletUnique(details, "billet_RES-2026-X89A.pdf")
+  PDF-->>MW: PDF généré dans /billets/
+
+  MW->>SMTP: envoyerEmailConfirmation(cfg, details, pdfPath)
+  SMTP-->>MW: Email envoyé avec pièce jointe PDF
+  MW-->>C: Dialogue de succès ("Réservation enregistrée & Billet PDF généré !")

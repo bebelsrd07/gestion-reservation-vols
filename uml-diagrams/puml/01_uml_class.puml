@@ -1,0 +1,132 @@
+@startuml
+' Diagramme de Classes UML - Astah UML / PlantUML Compatible
+' Projet TicketFly : Système de réservation de billets d'avion (C++/Qt6)
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam style strictuml
+
+class MainWindow {
+  - ui : Ui_MainWindow*
+  - m_db : DatabaseManager*
+  - m_idUtilisateur : int
+  - m_role : QString
+  - m_aeroports : QList<AeroportInfo>
+  - m_itinerairesTrouves : QList<ItinerairePropose>
+  + MainWindow(db : DatabaseManager*, parent : QWidget*)
+  + lancerRecherche() : void
+  + traiterConnexion() : void
+  + traiterInscription() : void
+  + validerDemandeReservation() : void
+  + telechargerMonBilletPdf() : void
+}
+
+class DatabaseManager {
+  - m_db : QSqlDatabase
+  - m_derniereErreur : QString
+  + connecter() : bool
+  + connecterUtilisateur(email : QString, mdp : QString) : bool
+  + inscrireClient(nom : QString, prenom : QString, email : QString, mdp : QString) : bool
+  + chargerAeroports() : QList<AeroportInfo>
+  + chargerLiaisons() : QHash
+  + creerReservation(idUser : int, itineraire : ItinerairePropose, passagers : QList<PassagerInfo>) : bool
+  + changerStatutReservation(ref : QString, statut : QString) : bool
+  + envoyerMessageBoite(idDest : int, role : QString, sujet : QString, contenu : QString) : bool
+  + obtenirStatistiquesAdmin() : StatistiquesAdmin
+}
+
+class PlanAvionWidget {
+  - m_nbPassagers : int
+  - m_occupes : QSet<QString>
+  - m_siegesChoisis : QStringList
+  - m_zonesSieges : QMap<QString, QRect>
+  + configurerCabine(nbPassagers : int, siegesOccupes : QSet<QString>) : void
+  + calculerSupplementTotal() : double
+  + siegesSelectionnes() : QStringList
+}
+
+class BilletPdf <<namespace>> {
+  + genererBilletUnique(reservation : DetailsReservation, cheminPdf : QString, erreur : QString) : bool
+  + cheminParDefautBillet(reference : QString) : QString
+}
+
+class SmtpClient <<namespace>> {
+  + chargerConfiguration() : ConfigSmtp
+  + sauvegarderConfiguration(cfg : ConfigSmtp) : void
+  + envoyerEmailConfirmation(cfg : ConfigSmtp, reservation : DetailsReservation, pathPdf : QString) : bool
+  + envoyerEmailTexteSimple(cfg : ConfigSmtp, dest : QString, sujet : QString, corps : QString) : bool
+}
+
+struct AeroportInfo {
+  + idAeroport : int
+  + codeIata : QString
+  + nomAeroport : QString
+  + ville : QString
+  + pays : QString
+  + codePays : QString
+  + latitude : double
+  + longitude : double
+  + estHub : bool
+  + affichageVillePays() : QString
+}
+
+struct TronconVol {
+  + idVolExistant : int
+  + numeroVol : QString
+  + compagnie : QString
+  + depart : AeroportInfo
+  + arrivee : AeroportInfo
+  + dateDepart : QDateTime
+  + dateArrivee : QDateTime
+  + distanceKm : int
+  + dureeMinutes : int
+  + prixUnitaire : double
+  + placesDisponibles : int
+}
+
+struct ItinerairePropose {
+  + troncons : QList<TronconVol>
+  + distanceTotaleKm : int
+  + dureeTotaleMinutes : int
+  + prixParPassager : double
+  + placesMinDisponibles : int
+  + nbEscales() : int
+  + trajetCourt() : QString
+}
+
+struct PassagerInfo {
+  + nom : QString
+  + prenom : QString
+  + dateNaissance : QDate
+  + numeroPasseport : QString
+  + siege : QString
+}
+
+struct DetailsReservation {
+  + idReservation : int
+  + reference : QString
+  + idUtilisateur : int
+  + nomClient : QString
+  + prenomClient : QString
+  + emailClient : QString
+  + nbPlaces : int
+  + prixTotal : double
+  + statut : QString
+  + troncons : QList<TronconVol>
+  + passagers : QList<PassagerInfo>
+}
+
+MainWindow "1" o-- "1" DatabaseManager : utilise
+MainWindow "1" o-- "1" PlanAvionWidget : contient
+MainWindow ..> BilletPdf : utilise
+MainWindow ..> SmtpClient : utilise
+MainWindow "1" *-- "0..*" ItinerairePropose
+MainWindow "1" *-- "0..*" DetailsReservation
+DatabaseManager ..> AeroportInfo
+DatabaseManager ..> DetailsReservation
+ItinerairePropose "1" *-- "1..*" TronconVol
+TronconVol "1" --> "2" AeroportInfo : depart & arrivee
+DetailsReservation "1" *-- "1..*" PassagerInfo
+DetailsReservation "1" *-- "1..*" TronconVol
+
+@enduml

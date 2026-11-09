@@ -1,0 +1,101 @@
+%% MLD - Modèle Logique de Données (Schéma Relationnel MySQL)
+%% Base: reservation_vol_db (TicketFly)
+graph TD
+  subgraph T_UTILISATEUR["TABLE: utilisateur"]
+    U1["<u>id_utilisateur</u> INT (PK, AUTO_INC)"]
+    U2["nom VARCHAR(50)"]
+    U3["prenom VARCHAR(50)"]
+    U4["email VARCHAR(100) (UNIQUE)"]
+    U5["mot_de_passe VARCHAR(255)"]
+    U6["role ENUM('client','admin','super_admin')"]
+    U7["est_bloque TINYINT(1)"]
+    U8["date_creation DATETIME"]
+  end
+
+  subgraph T_AEROPORT["TABLE: aeroport"]
+    A1["<u>id_aeroport</u> INT (PK, AUTO_INC)"]
+    A2["code_iata CHAR(3) (UNIQUE)"]
+    A3["nom_aeroport VARCHAR(100)"]
+    A4["ville VARCHAR(80)"]
+    A5["pays VARCHAR(80)"]
+    A6["code_pays CHAR(2)"]
+    A7["latitude DECIMAL(9,6)"]
+    A8["longitude DECIMAL(9,6)"]
+    A9["est_hub TINYINT(1)"]
+  end
+
+  subgraph T_LIAISON["TABLE: liaison"]
+    L1["<u>id_liaison</u> INT (PK, AUTO_INC)"]
+    L2["#id_aeroport_depart INT (FK -> aeroport)"]
+    L3["#id_aeroport_arrivee INT (FK -> aeroport)"]
+    L4["distance_km INT"]
+    L5["duree_minutes INT"]
+    L6["prix_base DECIMAL(8,2)"]
+  end
+
+  subgraph T_VOL["TABLE: vol"]
+    V1["<u>id_vol</u> INT (PK, AUTO_INC)"]
+    V2["numero_vol VARCHAR(16) (UNIQUE)"]
+    V3["compagnie VARCHAR(60)"]
+    V4["#id_aeroport_depart INT (FK -> aeroport)"]
+    V5["#id_aeroport_arrivee INT (FK -> aeroport)"]
+    V6["date_depart DATETIME"]
+    V7["date_arrivee DATETIME"]
+    V8["distance_km INT"]
+    V9["duree_minutes INT"]
+    V10["prix DECIMAL(8,2)"]
+    V11["capacite INT"]
+    V12["places_disponibles INT"]
+    V13["statut_vol ENUM('programme','annule')"]
+  end
+
+  subgraph T_RESERVATION["TABLE: reservation"]
+    R1["<u>id_reservation</u> INT (PK, AUTO_INC)"]
+    R2["reference VARCHAR(20) (UNIQUE)"]
+    R3["#id_utilisateur INT (FK -> utilisateur)"]
+    R4["nb_places INT"]
+    R5["prix_total DECIMAL(10,2)"]
+    R6["statut ENUM('en_attente','confirmee','annulee')"]
+    R7["nb_escales INT"]
+    R8["mode_paiement VARCHAR(40)"]
+    R9["contact_paiement VARCHAR(100)"]
+    R10["reference_paiement VARCHAR(80)"]
+    R11["date_reservation DATETIME"]
+  end
+
+  subgraph T_RESERVATION_VOL["TABLE: reservation_vol"]
+    RV1["<u>#id_reservation</u> INT (PK, FK -> reservation)"]
+    RV2["<u>ordre_troncon</u> INT (PK)"]
+    RV3["#id_vol INT (FK -> vol)"]
+  end
+
+  subgraph T_PASSAGER["TABLE: passager"]
+    P1["<u>id_passager</u> INT (PK, AUTO_INC)"]
+    P2["#id_reservation INT (FK -> reservation)"]
+    P3["nom VARCHAR(60)"]
+    P4["prenom VARCHAR(60)"]
+    P5["date_naissance DATE"]
+    P6["numero_passeport VARCHAR(20)"]
+    P7["siege VARCHAR(8)"]
+  end
+
+  subgraph T_NOTIFICATION["TABLE: notification_message"]
+    N1["<u>id_message</u> INT (PK, AUTO_INC)"]
+    N2["id_destinataire INT"]
+    N3["role_cible ENUM('client','admin')"]
+    N4["id_expediteur INT"]
+    N5["nom_expediteur VARCHAR(100)"]
+    N6["email_expediteur VARCHAR(100)"]
+    N7["categorie VARCHAR(40)"]
+    N8["sujet VARCHAR(160)"]
+    N9["contenu TEXT"]
+    N10["est_lu TINYINT(1)"]
+    N11["date_envoi DATETIME"]
+  end
+
+  T_AEROPORT -->|"FK: depart/arrivee"| T_LIAISON
+  T_AEROPORT -->|"FK: depart/arrivee"| T_VOL
+  T_UTILISATEUR -->|"1,N -> FK: id_utilisateur"| T_RESERVATION
+  T_RESERVATION -->|"1,N -> FK: id_reservation"| T_RESERVATION_VOL
+  T_VOL -->|"1,N -> FK: id_vol"| T_RESERVATION_VOL
+  T_RESERVATION -->|"1,N -> FK: id_reservation"| T_PASSAGER

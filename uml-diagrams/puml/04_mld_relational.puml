@@ -1,0 +1,118 @@
+@startuml
+' MLD - Modèle Logique de Données (Schéma Relationnel)
+' Projet TicketFly : Base reservation_vol_db
+
+skinparam class {
+  BackgroundColor White
+  ArrowColor Black
+  BorderColor Black
+}
+
+class "TABLE: utilisateur" as T_UTILISATEUR {
+  <b>id_utilisateur</b> : INT [PK, AUTO_INC]
+  --
+  nom : VARCHAR(50)
+  prenom : VARCHAR(50)
+  email : VARCHAR(100) [UNIQUE]
+  mot_de_passe : VARCHAR(255)
+  role : ENUM('client','admin','super_admin')
+  est_bloque : TINYINT(1)
+  date_creation : DATETIME
+}
+
+class "TABLE: aeroport" as T_AEROPORT {
+  <b>id_aeroport</b> : INT [PK, AUTO_INC]
+  --
+  code_iata : CHAR(3) [UNIQUE]
+  nom_aeroport : VARCHAR(100)
+  ville : VARCHAR(80)
+  pays : VARCHAR(80)
+  code_pays : CHAR(2)
+  latitude : DECIMAL(9,6)
+  longitude : DECIMAL(9,6)
+  est_hub : TINYINT(1)
+}
+
+class "TABLE: liaison" as T_LIAISON {
+  <b>id_liaison</b> : INT [PK, AUTO_INC]
+  --
+  <i>id_aeroport_depart</i> : INT [FK -> aeroport.id_aeroport]
+  <i>id_aeroport_arrivee</i> : INT [FK -> aeroport.id_aeroport]
+  distance_km : INT
+  duree_minutes : INT
+  prix_base : DECIMAL(8,2)
+}
+
+class "TABLE: vol" as T_VOL {
+  <b>id_vol</b> : INT [PK, AUTO_INC]
+  --
+  numero_vol : VARCHAR(16) [UNIQUE]
+  compagnie : VARCHAR(60)
+  <i>id_aeroport_depart</i> : INT [FK -> aeroport.id_aeroport]
+  <i>id_aeroport_arrivee</i> : INT [FK -> aeroport.id_aeroport]
+  date_depart : DATETIME
+  date_arrivee : DATETIME
+  distance_km : INT
+  duree_minutes : INT
+  prix : DECIMAL(8,2)
+  capacite : INT
+  places_disponibles : INT
+  statut_vol : ENUM('programme','annule')
+}
+
+class "TABLE: reservation" as T_RESERVATION {
+  <b>id_reservation</b> : INT [PK, AUTO_INC]
+  --
+  reference : VARCHAR(20) [UNIQUE]
+  <i>id_utilisateur</i> : INT [FK -> utilisateur.id_utilisateur]
+  nb_places : INT
+  prix_total : DECIMAL(10,2)
+  statut : ENUM('en_attente','confirmee','annulee')
+  nb_escales : INT
+  mode_paiement : VARCHAR(40)
+  contact_paiement : VARCHAR(100)
+  reference_paiement : VARCHAR(80)
+  date_reservation : DATETIME
+}
+
+class "TABLE: reservation_vol" as T_RESERVATION_VOL {
+  <b>id_reservation</b> : INT [PK, FK -> reservation.id_reservation]
+  <b>ordre_troncon</b> : INT [PK]
+  --
+  <i>id_vol</i> : INT [FK -> vol.id_vol]
+}
+
+class "TABLE: passager" as T_PASSAGER {
+  <b>id_passager</b> : INT [PK, AUTO_INC]
+  --
+  <i>id_reservation</i> : INT [FK -> reservation.id_reservation]
+  nom : VARCHAR(60)
+  prenom : VARCHAR(60)
+  date_naissance : DATE
+  numero_passeport : VARCHAR(20)
+  siege : VARCHAR(8)
+}
+
+class "TABLE: notification_message" as T_NOTIFICATION {
+  <b>id_message</b> : INT [PK, AUTO_INC]
+  --
+  id_destinataire : INT
+  role_cible : ENUM('client','admin')
+  id_expediteur : INT
+  nom_expediteur : VARCHAR(100)
+  email_expediteur : VARCHAR(100)
+  categorie : VARCHAR(40)
+  sujet : VARCHAR(160)
+  contenu : TEXT
+  est_lu : TINYINT(1)
+  date_envoi : DATETIME
+}
+
+T_AEROPORT --o{ T_LIAISON : "1,N"
+T_AEROPORT --o{ T_VOL : "1,N"
+T_UTILISATEUR --o{ T_RESERVATION : "1,N"
+T_RESERVATION --o{ T_RESERVATION_VOL : "1,N"
+T_VOL --o{ T_RESERVATION_VOL : "1,N"
+T_RESERVATION --o{ T_PASSAGER : "1,N"
+
+@enduml

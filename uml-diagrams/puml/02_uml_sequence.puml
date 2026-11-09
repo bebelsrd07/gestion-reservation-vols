@@ -1,0 +1,48 @@
+@startuml
+' Diagramme de Séquence UML - Astah UML / PlantUML Compatible
+' Scénario : Recherche, Réservation, Choix des sièges, Paiement TicketFly & Génération Billet PDF
+
+autonumber
+actor Client
+participant "MainWindow\n(Qt GUI)" as MW
+participant "PlanAvionWidget\n(SeatMap)" as PAW
+participant "DatabaseManager\n(MySQL)" as DB
+participant "BilletPdf\n(PDF Engine)" as PDF
+participant "SmtpClient\n(SSL/TLS)" as SMTP
+
+Client -> MW : 1. Saisie des critères (Ville Départ, Arrivée, Date, Passagers)
+MW -> DB : chargerAeroports() & chargerLiaisons()
+DB --> MW : Liste aéroports + liaisons
+MW -> MW : Calcul des itinéraires (direct & 1-2 escales)
+MW --> Client : Affichage des propositions d'itinéraires
+
+Client -> MW : 2. Sélection d'un itinéraire + Clic "Réserver"
+MW -> DB : chargerSiegesOccupesVol(idVol)
+DB --> MW : QSet<QString> des sièges occupés
+MW -> PAW : configurerCabine(nbPassagers, siegesOccupes)
+PAW --> Client : Affichage interactif du plan d'avion
+
+Client -> PAW : 3. Sélection graphique des sièges (ex: 12A, 12B)
+PAW --> MW : signal selectionModifiee()
+Client -> MW : 4. Saisie des identités (Nom, Prénom, Passeport) + Paiement TicketFly
+Client -> MW : 5. Clic "Valider la réservation"
+
+MW -> DB : creerReservation(idUser, itineraire, passagers, paiement)
+note over DB
+  - INSERT INTO reservation
+  - INSERT INTO reservation_vol
+  - INSERT INTO passager
+  - UPDATE vol SET places_disponibles = places - N
+end note
+DB --> MW : Référence générée (ex: "RES-2026-X89A")
+
+MW -> DB : obtenirDetailsReservation("RES-2026-X89A")
+DB --> MW : DetailsReservation complets
+MW -> PDF : genererBilletUnique(details, "billet_RES-2026-X89A.pdf")
+PDF --> MW : Fichier PDF créé dans /billets/
+
+MW -> SMTP : envoyerEmailConfirmation(cfg, details, pdfPath)
+SMTP --> MW : Email envoyé avec pièce jointe PDF
+MW --> Client : Notification de succès ("Réservation validée & Billet PDF envoyé !")
+
+@enduml

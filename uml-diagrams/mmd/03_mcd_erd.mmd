@@ -1,0 +1,104 @@
+%% MCD - Modèle Conceptuel de Données (Entité-Relation)
+%% Base de données MySQL : reservation_vol_db (TicketFly)
+erDiagram
+  UTILISATEUR {
+    int id_utilisateur PK
+    string nom
+    string prenom
+    string email UK
+    string mot_de_passe
+    string role
+    boolean est_bloque
+    datetime date_creation
+  }
+
+  AEROPORT {
+    int id_aeroport PK
+    string code_iata UK
+    string nom_aeroport
+    string ville
+    string pays
+    string code_pays
+    decimal latitude
+    decimal longitude
+    boolean est_hub
+  }
+
+  LIAISON {
+    int id_liaison PK
+    int id_aeroport_depart FK
+    int id_aeroport_arrivee FK
+    int distance_km
+    int duree_minutes
+    decimal prix_base
+  }
+
+  VOL {
+    int id_vol PK
+    string numero_vol UK
+    string compagnie
+    int id_aeroport_depart FK
+    int id_aeroport_arrivee FK
+    datetime date_depart
+    datetime date_arrivee
+    int distance_km
+    int duree_minutes
+    decimal prix
+    int capacite
+    int places_disponibles
+    string statut_vol
+  }
+
+  RESERVATION {
+    int id_reservation PK
+    string reference UK
+    int id_utilisateur FK
+    int nb_places
+    decimal prix_total
+    string statut
+    int nb_escales
+    string mode_paiement
+    string contact_paiement
+    string reference_paiement
+    datetime date_reservation
+  }
+
+  RESERVATION_VOL {
+    int id_reservation PK
+    int ordre_troncon PK
+    int id_vol FK
+  }
+
+  PASSAGER {
+    int id_passager PK
+    int id_reservation FK
+    string nom
+    string prenom
+    date date_naissance
+    string numero_passeport
+    string siege
+  }
+
+  NOTIFICATION_MESSAGE {
+    int id_message PK
+    int id_destinataire
+    string role_cible
+    int id_expediteur
+    string nom_expediteur
+    string email_expediteur
+    string categorie
+    string sujet
+    string contenu
+    boolean est_lu
+    datetime date_envoi
+  }
+
+  UTILISATEUR ||--o{ RESERVATION : effectue
+  AEROPORT ||--o{ LIAISON : depart_de
+  AEROPORT ||--o{ LIAISON : arrivee_a
+  AEROPORT ||--o{ VOL : part_de
+  AEROPORT ||--o{ VOL : arrive_a
+  RESERVATION ||--|{ RESERVATION_VOL : composee_de
+  VOL ||--o{ RESERVATION_VOL : inclut
+  RESERVATION ||--|{ PASSAGER : concerne
+  UTILISATEUR ||--o{ NOTIFICATION_MESSAGE : recoit

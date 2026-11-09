@@ -1,0 +1,123 @@
+%% Diagramme de classes UML - Projet TicketFly (Réservation de Billets d'Avion C++/Qt6)
+classDiagram
+  class MainWindow {
+    -ui Ui_MainWindow
+    -m_db DatabaseManager
+    -m_idUtilisateur int
+    -m_role string
+    -m_aeroports List
+    -m_itinerairesTrouves List
+    +lancerRecherche() void
+    +traiterConnexion() void
+    +traiterInscription() void
+    +validerDemandeReservation() void
+    +telechargerMonBilletPdf() void
+  }
+
+  class DatabaseManager {
+    -m_db QSqlDatabase
+    -m_derniereErreur string
+    +connecter() bool
+    +connecterUtilisateur(email, mdp) bool
+    +inscrireClient(nom, prenom, email, mdp) bool
+    +chargerAeroports() List
+    +chargerLiaisons() Hash
+    +creerReservation(idUser, itineraire, passagers) bool
+    +changerStatutReservation(ref, statut) bool
+    +envoyerMessageBoite(idDest, role, sujet, contenu) bool
+    +obtenirStatistiquesAdmin() StatistiquesAdmin
+  }
+
+  class PlanAvionWidget {
+    -m_nbPassagers int
+    -m_occupes Set
+    -m_siegesChoisis StringList
+    -m_zonesSieges Map
+    +configurerCabine(nbPassagers, siegesOccupes) void
+    +calculerSupplementTotal() double
+    +siegesSelectionnes() StringList
+  }
+
+  class BilletPdf {
+    +genererBilletUnique(reservation, pathPdf, erreur) bool
+    +cheminParDefautBillet(reference) string
+  }
+
+  class SmtpClient {
+    +chargerConfiguration() ConfigSmtp
+    +sauvegarderConfiguration(cfg) void
+    +envoyerEmailConfirmation(cfg, reservation, pathPdf) bool
+    +envoyerEmailTexteSimple(cfg, dest, sujet, corps) bool
+  }
+
+  class AeroportInfo {
+    +idAeroport int
+    +codeIata string
+    +nomAeroport string
+    +ville string
+    +pays string
+    +codePays string
+    +latitude double
+    +longitude double
+    +estHub bool
+    +affichageVillePays() string
+  }
+
+  class TronconVol {
+    +idVolExistant int
+    +numeroVol string
+    +compagnie string
+    +depart AeroportInfo
+    +arrivee AeroportInfo
+    +dateDepart QDateTime
+    +dateArrivee QDateTime
+    +distanceKm int
+    +dureeMinutes int
+    +prixUnitaire double
+    +placesDisponibles int
+  }
+
+  class ItinerairePropose {
+    +troncons List
+    +distanceTotaleKm int
+    +dureeTotaleMinutes int
+    +prixParPassager double
+    +placesMinDisponibles int
+    +nbEscales() int
+    +trajetCourt() string
+  }
+
+  class PassagerInfo {
+    +nom string
+    +prenom string
+    +dateNaissance QDate
+    +numeroPasseport string
+    +siege string
+  }
+
+  class DetailsReservation {
+    +idReservation int
+    +reference string
+    +idUtilisateur int
+    +nomClient string
+    +prenomClient string
+    +emailClient string
+    +nbPlaces int
+    +prixTotal double
+    +statut string
+    +troncons List
+    +passagers List
+  }
+
+  MainWindow o-- DatabaseManager : utilise
+  MainWindow o-- PlanAvionWidget : contient
+  MainWindow ..> BilletPdf : utilise
+  MainWindow ..> SmtpClient : utilise
+  MainWindow *-- ItinerairePropose
+  MainWindow *-- DetailsReservation
+  DatabaseManager ..> AeroportInfo
+  DatabaseManager ..> DetailsReservation
+  ItinerairePropose *-- TronconVol
+  TronconVol --> AeroportInfo
+  DetailsReservation *-- PassagerInfo
+  DetailsReservation *-- TronconVol
