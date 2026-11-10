@@ -1,6 +1,6 @@
 # ✈️ Gestion de Réservation de Billets d'Avion
 
-Application de bureau développée en **C++** avec le framework **Qt** et une base de données **MySQL** dans le cadre du projet de fin d'année.
+Application de bureau développée en **C++** avec le framework **Qt** et une base de données **MySQL** dans le cadre du projet de fin d'année.La base de donnée est locale et toutes les informations sont centralisée dans l'application
 
 ## 📌 Structure du projet
 
